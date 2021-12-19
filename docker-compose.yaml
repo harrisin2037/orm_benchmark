@@ -1,0 +1,22 @@
+version: '3.9'
+
+services:
+  postgres:
+    image: postgres
+    environment:
+      - POSTGRES_USER=pgdb_user
+      - POSTGRES_PASSWORD=secret
+      - POSTGRES_DB=orm_test
+    logging:
+      options:
+        max-size: 10m
+        max-file: "3"
+    healthcheck:
+      test: ['CMD', 'pg_isready']
+      timeout: 5s
+      interval: 10s
+      retries: 5
+    ports:
+      - 5432:5432
+    # volumes:
+    #   - ./sql/create_tables.sql:/docker-entrypoint-initdb.d/create_tables.sql

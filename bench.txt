@@ -1,0 +1,1 @@
+ok  	github.com/harrisin2037/orm_benchmark	0.552s

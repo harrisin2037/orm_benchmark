@@ -1,0 +1,49 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+
+  test:
+    name: Test
+    runs-on: ubuntu-20.04
+    strategy:
+      matrix:
+        go-version: [1.14, 1.15, 1.16, 1.17]
+        pgdb-version: [10, 11, 12, 13, 14, cockroachdb]
+        include:
+          - pgdb-version: 10
+            orm-test-database: postgres://pgdb_user:secret@127.0.0.1/orm_test
+          - pgdb-version: 11
+            orm-test-database: postgres://pgdb_user:secret@127.0.0.1/orm_test
+          - pgdb-version: 12
+            orm-test-database: postgres://pgdb_user:secret@127.0.0.1/orm_test
+          - pgdb-version: 13
+            orm-test-database: postgres://pgdb_user:secret@127.0.0.1/orm_test
+          - pgdb-version: 14
+            orm-test-database: postgres://pgdb_user:secret@127.0.0.1/orm_test
+          - pgdb-version: cockroachdb
+            orm-test-database: "postgresql://root@127.0.0.1:26257/orm_test?sslmode=disable&experimental_enable_temp_tables=on"
+
+    steps:
+    - name: Set up Go 1.x
+      uses: actions/setup-go@v2
+      with:
+        go-version: ${{ matrix.go-version }}
+
+    - name: Check out code into the Go module directory
+      uses: actions/checkout@v2
+
+    - name: Setup database server for testing
+      run: ci/setup_test.bash
+      env:
+        PGDBVERSION: ${{ matrix.pgdb-version }}
+
+    - name: Test
+      run: go test -race ./...
+      env:
+        ORM_TEST_DATABASE: ${{ matrix.orm-test-database }}
