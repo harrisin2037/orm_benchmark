@@ -17,6 +17,15 @@ var allORMs = map[string]func() BenchORMInstance{
 	"pgx": PgxTestBenchORMInstance,
 }
 
+type Test struct {
+	name string
+	run  func(b *testing.B, ins BenchORMInstance)
+}
+
+var tests = []Test{
+	{"connection test", testConn},
+}
+
 /*
 	As testing main will never return as it calls os.Exit(), all benchmark tests cannot be run,
 	so need to assembling the dynamic benchmark cases (values of struct testing.InternalBenchmark,
@@ -27,21 +36,12 @@ var allORMs = map[string]func() BenchORMInstance{
 
 	Notes: testing.Main() will never return as it calls os.Exit().
 	If you want to perform further logging and calculations on the benchmark results,
-	you may also call testing.MainStart().Run() (which is what testing.Main() does), 
+	you may also call testing.MainStart().Run() (which is what testing.Main() does),
 	and you may pass the exit code which is returned by M.Run() to os.Exit().
 */
 func TestMain(m *testing.M) {
 
-	type Test struct {
-		name string
-		run  func(b *testing.B, ins BenchORMInstance)
-	}
-
 	godotenv.Load(".env")
-
-	tests := []Test{
-		{"connection test", testConn},
-	}
 
 	benchmarks := []testing.InternalBenchmark{}
 
