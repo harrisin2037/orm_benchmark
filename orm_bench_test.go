@@ -19,6 +19,7 @@ func (f MatchStringOnly) WriteProfileTo(string, io.Writer, int) error { return n
 func (f MatchStringOnly) ImportPath() string                          { return "" }
 func (f MatchStringOnly) StartTestLog(io.Writer)                      {}
 func (f MatchStringOnly) StopTestLog() error                          { return nil }
+func (f MatchStringOnly) SetPanicOnExit0(v bool)                      {}
 
 type BenchORMInstance interface {
 	ConnTest(*testing.B)
