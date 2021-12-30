@@ -1,0 +1,5 @@
+goos: darwin
+goarch: amd64
+orm_benchmark.Test[test case = connection test, orm = pgx]-4   	     162	   6989843 ns/op	   66168 B/op	     534 allocs/op
+PASS
+ok  	github.com/harrisin2037/orm_benchmark	1.985s
