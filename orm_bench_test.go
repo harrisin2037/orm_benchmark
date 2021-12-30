@@ -2,10 +2,23 @@ package orm_benchmark
 
 import (
 	"fmt"
+	"io"
 	"testing"
 
 	"github.com/joho/godotenv"
 )
+
+type MatchStringOnly func(pat, str string) (bool, error)
+
+var MatchFunc MatchStringOnly = func(pat, str string) (bool, error) { return true, nil }
+
+func (f MatchStringOnly) MatchString(pat, str string) (bool, error)   { return f(pat, str) }
+func (f MatchStringOnly) StartCPUProfile(w io.Writer) error           { return nil }
+func (f MatchStringOnly) StopCPUProfile()                             {}
+func (f MatchStringOnly) WriteProfileTo(string, io.Writer, int) error { return nil }
+func (f MatchStringOnly) ImportPath() string                          { return "" }
+func (f MatchStringOnly) StartTestLog(io.Writer)                      {}
+func (f MatchStringOnly) StopTestLog() error                          { return nil }
 
 type BenchORMInstance interface {
 	ConnTest(*testing.B)
@@ -57,9 +70,8 @@ func TestMain(m *testing.M) {
 			benchmarks = append(benchmarks, bm)
 		}
 	}
-	anything := func(pat, str string) (bool, error) { return true, nil }
 
-	testing.Main(anything, nil, benchmarks, nil)
+	testing.MainStart(MatchFunc, []testing.InternalTest{}, benchmarks, nil).Run()
 }
 
 func testConn(b *testing.B, ins BenchORMInstance) {
